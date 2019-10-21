@@ -1,8 +1,5 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
 ---
 
 ### Introduction
@@ -53,9 +50,7 @@ head(Total_Steps, 10)
 2. Histogram of the total number of steps taken each day. 
 
 ```{r}
-ggplot(Total_Steps, aes(x = steps)) +
-    geom_histogram(fill = "yellow", binwidth = 1000) +
-    labs(title = "Daily Steps", x = "Steps", y = "Frequency")
+ggplot(Total_Steps, aes(x = steps)) + geom_histogram(fill = "yellow", binwidth = 1000) + labs(title = "Daily Steps", x = "Steps", y = "Frequency")
 ```
 
 3. Mean and median of the total number of steps taken per day
