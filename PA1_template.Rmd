@@ -101,17 +101,17 @@ activityDT[is.na(steps),"steps"]<-activityDT[,c(lapply(.SD,median,na.rm=TRUE)),.
 3. Creating a new dataset that is equal to the original dataset but with the missing data filled in.
 
 ```{r}
-data.table::fwrite(x = activityDT, file = "data/tidyData.csv", quote = FALSE)
+data.table::fwrite(x=activityDT,file="data/tidyData.csv",quote=FALSE)
 ```
 
 4. Histogram of the total number of steps taken each day and calculate and report the mean and median total number of steps taken per day. These values differ from the estimates from the first part of the assignment. What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 ```{r}
 # total number of steps taken per day
-Total_Steps <- activityDT[, c(lapply(.SD, sum)), .SDcols = c("steps"), by = .(date)] 
+Total_Steps<-activityDT[,c(lapply(.SD,sum)),.SDcols=c("steps"),by=.(date)]
 # mean and median total number of steps taken per day
-Total_Steps[, .(Mean_Steps = mean(steps), Median_Steps = median(steps))]
-ggplot(Total_Steps, aes(x = steps)) + geom_histogram(fill = "blue", binwidth = 1000) + labs(title = "Daily Steps", x = "Steps", y = "Frequency")
+Total_Steps[,.(Mean_Steps=mean(steps),Median_Steps=median(steps))]
+ggplot(Total_Steps,aes(x=steps))+geom_histogram(fill="blue",binwidth=1000)+labs(title="Daily Steps",x="Steps",y="Frequency")
 ```
 
 The impact of imputing missing data on the estimates of the total daily number of steps is shown in the below table : 
