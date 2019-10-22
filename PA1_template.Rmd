@@ -2,6 +2,15 @@
 title: "Reproducible Research: Peer Assessment 1"
 ---
 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r global_options}
+knitr::opts_chunk$set(fig.path='Figs/')
+```
+
 ### Introduction
 
 It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the “quantified self” movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data.
@@ -27,8 +36,8 @@ Unzip data to obtain a csv file and add the necessary libraries.
 ```{r}
 library("data.table")
 library(ggplot2)
-fileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
-download.file(fileUrl, destfile = paste0(getwd(), '/repdata%2Fdata%2Factivity.zip'), method = "curl")
+fileUrl<-"https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+download.file(fileUrl,destfile=paste0(getwd(),'/repdata%2Fdata%2Factivity.zip'),method = "curl")
 unzip("repdata%2Fdata%2Factivity.zip",exdir = "data")
 ```
 
@@ -50,7 +59,7 @@ head(Total_Steps, 10)
 2. Histogram of the total number of steps taken each day. 
 
 ```{r}
-ggplot(Total_Steps, aes(x = steps)) + geom_histogram(fill = "yellow", binwidth = 1000) + labs(title = "Daily Steps", x = "Steps", y = "Frequency")
+ggplot(Total_Steps,aes(x=steps))+geom_histogram(fill="yellow",binwidth=1000)+labs(title="Daily Steps",x="Steps",y="Frequency")
 ```
 
 3. Mean and median of the total number of steps taken per day
