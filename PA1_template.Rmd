@@ -1,13 +1,16 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
+title: 'Reproducible Research: Peer Assessment 1'
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup,include=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
 ```
 
-```{r global_options}
+```{r global_options,include=FALSE}
 knitr::opts_chunk$set(fig.path='Figs/')
 ```
 
@@ -37,14 +40,14 @@ Unzip data to obtain a csv file and add the necessary libraries.
 library("data.table")
 library(ggplot2)
 fileUrl<-"https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
-download.file(fileUrl,destfile=paste0(getwd(),'/repdata%2Fdata%2Factivity.zip'),method = "curl")
+download.file(fileUrl,destfile=paste0(getwd(),'/repdata%2Fdata%2Factivity.zip'),method="curl")
 unzip("repdata%2Fdata%2Factivity.zip",exdir = "data")
 ```
 
 #### Reading data
 
 ```{r}
-activityDT <- data.table::fread(input = "data/activity.csv")
+activityDT<-data.table::fread(input="data/activity.csv")
 ```
 
 ### What is mean total number of steps taken per day?
@@ -52,8 +55,8 @@ activityDT <- data.table::fread(input = "data/activity.csv")
 1. Total number of steps taken per day
 
 ```{r}
-Total_Steps <- activityDT[, c(lapply(.SD, sum, na.rm = FALSE)), .SDcols = c("steps"), by = .(date)] 
-head(Total_Steps, 10)
+Total_Steps<-activityDT[,c(lapply(.SD,sum,na.rm=FALSE)),.SDcols=c("steps"),by=.(date)] 
+head(Total_Steps,10)
 ```
 
 2. Histogram of the total number of steps taken each day. 
@@ -64,7 +67,7 @@ ggplot(Total_Steps,aes(x=steps))+geom_histogram(fill="yellow",binwidth=1000)+lab
 
 3. Mean and median of the total number of steps taken per day
 ```{r}
-Total_Steps[, .(Mean_Steps = mean(steps, na.rm = TRUE), Median_Steps = median(steps, na.rm = TRUE))]
+Total_Steps[,.(Mean_Steps=mean(steps,na.rm=TRUE),Median_Steps=median(steps,na.rm=TRUE))]
 ```
 
 ### What is the average daily activity pattern?
@@ -72,14 +75,14 @@ Total_Steps[, .(Mean_Steps = mean(steps, na.rm = TRUE), Median_Steps = median(st
 1. Time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
 ```{r}
-IntervalDT <- activityDT[, c(lapply(.SD, mean, na.rm = TRUE)), .SDcols = c("steps"), by = .(interval)] 
-ggplot(IntervalDT, aes(x = interval , y = steps)) + geom_line(color="red", size=1) + labs(title = "Avg. Daily Steps", x = "Interval", y = "Avg. Steps per day")
+IntervalDT<-activityDT[,c(lapply(.SD,mean,na.rm=TRUE)),.SDcols=c("steps"),by=.(interval)] 
+ggplot(IntervalDT,aes(x=interval,y=steps))+geom_line(color="red",size=1)+labs(title="Avg. Daily Steps",x="Interval",y="Avg. Steps per day")
 ```
 
 2. the maximum number of steps on average across all the days in the dataset in 5-minute interval
 
 ```{r}
-IntervalDT[steps == max(steps), .(max_interval = interval)]
+IntervalDT[steps==max(steps),.(max_interval= interval)]
 ```
 
 ## Imputing missing values
@@ -87,12 +90,12 @@ IntervalDT[steps == max(steps), .(max_interval = interval)]
 1. Total number of missing values in the dataset (i.e. the total number of rows with 𝙽𝙰s)
 
 ```{r}
-activityDT[is.na(steps), .N ]
+nrow(activityDT[is.na(steps),])
 ```
 
 2. Filling in missing values with median of dataset.
 ```{r}
-activityDT[is.na(steps), "steps"] <- activityDT[, c(lapply(.SD, median, na.rm = TRUE)), .SDcols = c("steps")]
+activityDT[is.na(steps),"steps"]<-activityDT[,c(lapply(.SD,median,na.rm=TRUE)),.SDcols=c("steps")]
 ```
 
 3. Creating a new dataset that is equal to the original dataset but with the missing data filled in.

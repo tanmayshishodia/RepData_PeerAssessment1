@@ -1,182 +1,179 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
-
 ### Introduction
 
-It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the “quantified self” movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data.
+It is now possible to collect a large amount of data about personal
+movement using activity monitoring devices such as a Fitbit, Nike
+Fuelband, or Jawbone Up. These type of devices are part of the
+“quantified self” movement – a group of enthusiasts who take
+measurements about themselves regularly to improve their health, to find
+patterns in their behavior, or because they are tech geeks. But these
+data remain under-utilized both because the raw data are hard to obtain
+and there is a lack of statistical methods and software for processing
+and interpreting the data.
 
-This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals through out the day. The data consists of two months of data from an anonymous individual collected during the months of October and November, 2012 and include the number of steps taken in 5 minute intervals each day.
+This assignment makes use of data from a personal activity monitoring
+device. This device collects data at 5 minute intervals through out the
+day. The data consists of two months of data from an anonymous
+individual collected during the months of October and November, 2012 and
+include the number of steps taken in 5 minute intervals each day.
 
 The data for this assignment can be downloaded from the course web site:
 
-Dataset: Activity monitoring data [52K]
-The variables included in this dataset are:
+Dataset: Activity monitoring data \[52K\] The variables included in this
+dataset are:
 
-- steps: Number of steps taking in a 5-minute interval (missing values are coded as \color{red}{\verb|NA|}NA)
-- date: The date on which the measurement was taken in YYYY-MM-DD format
-- interval: Identifier for the 5-minute interval in which measurement was taken
+-   steps: Number of steps taking in a 5-minute interval (missing values
+    are coded as NA)
+-   date: The date on which the measurement was taken in YYYY-MM-DD
+    format
+-   interval: Identifier for the 5-minute interval in which measurement
+    was taken
 
-The dataset is stored in a comma-separated-value (CSV) file and there are a total of 17,568 observations in this dataset.
-
+The dataset is stored in a comma-separated-value (CSV) file and there
+are a total of 17,568 observations in this dataset.
 
 ### Loading and preprocessing the data
 
 Unzip data to obtain a csv file and add the necessary libraries.
 
-
-```r
+``` r
 library("data.table")
 library(ggplot2)
-fileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
-download.file(fileUrl, destfile = paste0(getwd(), '/repdata%2Fdata%2Factivity.zip'), method = "curl")
+fileUrl<-"https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+download.file(fileUrl,destfile=paste0(getwd(),'/repdata%2Fdata%2Factivity.zip'),method="curl")
 unzip("repdata%2Fdata%2Factivity.zip",exdir = "data")
 ```
 
 #### Reading data
 
-
-```r
-activityDT <- data.table::fread(input = "data/activity.csv")
+``` r
+activityDT<-data.table::fread(input="data/activity.csv")
 ```
 
 ### What is mean total number of steps taken per day?
 
-1. Total number of steps taken per day
+1.  Total number of steps taken per day
 
-
-```r
-Total_Steps <- activityDT[, c(lapply(.SD, sum, na.rm = FALSE)), .SDcols = c("steps"), by = .(date)] 
-head(Total_Steps, 10)
+``` r
+Total_Steps<-activityDT[,c(lapply(.SD,sum,na.rm=FALSE)),.SDcols=c("steps"),by=.(date)] 
+head(Total_Steps,10)
 ```
 
-```
-##           date steps
-##  1: 2012-10-01    NA
-##  2: 2012-10-02   126
-##  3: 2012-10-03 11352
-##  4: 2012-10-04 12116
-##  5: 2012-10-05 13294
-##  6: 2012-10-06 15420
-##  7: 2012-10-07 11015
-##  8: 2012-10-08    NA
-##  9: 2012-10-09 12811
-## 10: 2012-10-10  9900
-```
+    ##           date steps
+    ##  1: 2012-10-01    NA
+    ##  2: 2012-10-02   126
+    ##  3: 2012-10-03 11352
+    ##  4: 2012-10-04 12116
+    ##  5: 2012-10-05 13294
+    ##  6: 2012-10-06 15420
+    ##  7: 2012-10-07 11015
+    ##  8: 2012-10-08    NA
+    ##  9: 2012-10-09 12811
+    ## 10: 2012-10-10  9900
 
-2. Histogram of the total number of steps taken each day. 
+1.  Histogram of the total number of steps taken each day.
 
-
-```r
-ggplot(Total_Steps, aes(x = steps)) +
-    geom_histogram(fill = "yellow", binwidth = 1000) +
-    labs(title = "Daily Steps", x = "Steps", y = "Frequency")
+``` r
+ggplot(Total_Steps,aes(x=steps))+geom_histogram(fill="yellow",binwidth=1000)+labs(title="Daily Steps",x="Steps",y="Frequency")
 ```
 
-```
-## Warning: Removed 8 rows containing non-finite values (stat_bin).
+    ## Warning: Removed 8 rows containing non-finite values (stat_bin).
+
+![](Figs/unnamed-chunk-4-1.png)
+
+1.  Mean and median of the total number of steps taken per day
+
+``` r
+Total_Steps[,.(Mean_Steps=mean(steps,na.rm=TRUE),Median_Steps=median(steps,na.rm=TRUE))]
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
-
-3. Mean and median of the total number of steps taken per day
-
-```r
-Total_Steps[, .(Mean_Steps = mean(steps, na.rm = TRUE), Median_Steps = median(steps, na.rm = TRUE))]
-```
-
-```
-##    Mean_Steps Median_Steps
-## 1:   10766.19        10765
-```
+    ##    Mean_Steps Median_Steps
+    ## 1:   10766.19        10765
 
 ### What is the average daily activity pattern?
 
-1. Time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+1.  Time series plot of the 5-minute interval (x-axis) and the average
+    number of steps taken, averaged across all days (y-axis)
 
-
-```r
-IntervalDT <- activityDT[, c(lapply(.SD, mean, na.rm = TRUE)), .SDcols = c("steps"), by = .(interval)] 
-ggplot(IntervalDT, aes(x = interval , y = steps)) + geom_line(color="red", size=1) + labs(title = "Avg. Daily Steps", x = "Interval", y = "Avg. Steps per day")
+``` r
+IntervalDT<-activityDT[,c(lapply(.SD,mean,na.rm=TRUE)),.SDcols=c("steps"),by=.(interval)] 
+ggplot(IntervalDT,aes(x=interval,y=steps))+geom_line(color="red",size=1)+labs(title="Avg. Daily Steps",x="Interval",y="Avg. Steps per day")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](Figs/unnamed-chunk-6-1.png)
 
-2. the maximum number of steps on average across all the days in the dataset in 5-minute interval
+1.  the maximum number of steps on average across all the days in the
+    dataset in 5-minute interval
 
-
-```r
-IntervalDT[steps == max(steps), .(max_interval = interval)]
+``` r
+IntervalDT[steps==max(steps),.(max_interval= interval)]
 ```
 
-```
-##    max_interval
-## 1:          835
-```
+    ##    max_interval
+    ## 1:          835
 
-## Imputing missing values
+Imputing missing values
+-----------------------
 
-1. Total number of missing values in the dataset (i.e. the total number of rows with 𝙽𝙰s)
+1.  Total number of missing values in the dataset (i.e. the total number
+    of rows with 𝙽𝙰s)
 
-
-```r
-activityDT[is.na(steps), .N ]
-```
-
-```
-## [1] 2304
+``` r
+nrow(activityDT[is.na(steps),])
 ```
 
-2. Filling in missing values with median of dataset.
+    ## [1] 2304
 
-```r
-activityDT[is.na(steps), "steps"] <- activityDT[, c(lapply(.SD, median, na.rm = TRUE)), .SDcols = c("steps")]
+1.  Filling in missing values with median of dataset.
+
+``` r
+activityDT[is.na(steps),"steps"]<-activityDT[,c(lapply(.SD,median,na.rm=TRUE)),.SDcols=c("steps")]
 ```
 
-3. Creating a new dataset that is equal to the original dataset but with the missing data filled in.
+1.  Creating a new dataset that is equal to the original dataset but
+    with the missing data filled in.
 
-
-```r
+``` r
 data.table::fwrite(x = activityDT, file = "data/tidyData.csv", quote = FALSE)
 ```
 
-4. Histogram of the total number of steps taken each day and calculate and report the mean and median total number of steps taken per day. These values differ from the estimates from the first part of the assignment. What is the impact of imputing missing data on the estimates of the total daily number of steps?
+1.  Histogram of the total number of steps taken each day and calculate
+    and report the mean and median total number of steps taken per day.
+    These values differ from the estimates from the first part of the
+    assignment. What is the impact of imputing missing data on the
+    estimates of the total daily number of steps?
 
-
-```r
+``` r
 # total number of steps taken per day
 Total_Steps <- activityDT[, c(lapply(.SD, sum)), .SDcols = c("steps"), by = .(date)] 
 # mean and median total number of steps taken per day
 Total_Steps[, .(Mean_Steps = mean(steps), Median_Steps = median(steps))]
 ```
 
-```
-##    Mean_Steps Median_Steps
-## 1:    9354.23        10395
-```
+    ##    Mean_Steps Median_Steps
+    ## 1:    9354.23        10395
 
-```r
+``` r
 ggplot(Total_Steps, aes(x = steps)) + geom_histogram(fill = "blue", binwidth = 1000) + labs(title = "Daily Steps", x = "Steps", y = "Frequency")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+![](Figs/unnamed-chunk-11-1.png)
 
-The impact of imputing missing data on the estimates of the total daily number of steps is shown in the below table : 
+The impact of imputing missing data on the estimates of the total daily
+number of steps is shown in the below table :
 
-Type of Estimate | Mean of Steps | Median of Steps
---- | --- | ---
-First Part (with na) | 10765 | 10765
-Second Part (na replaced with median) | 9354.23 | 10395
+| Type of Estimate                      | Mean of Steps | Median of Steps |
+|---------------------------------------|---------------|-----------------|
+| First Part (with na)                  | 10765         | 10765           |
+| Second Part (na replaced with median) | 9354.23       | 10395           |
 
-## Are there differences in activity patterns between weekdays and weekends?
+Are there differences in activity patterns between weekdays and weekends?
+-------------------------------------------------------------------------
 
-1. Creating a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+1.  Creating a new factor variable in the dataset with two levels –
+    “weekday” and “weekend” indicating whether a given date is a weekday
+    or weekend day.
 
-
-```r
+``` r
 activityDT <- data.table::fread(input = "data/activity.csv")
 activityDT[, date := as.POSIXct(date, format = "%Y-%m-%d")]
 activityDT[, `Day of Week`:= weekdays(x = date)]
@@ -186,27 +183,26 @@ activityDT[, `weekday or weekend` := as.factor(`weekday or weekend`)]
 head(activityDT, 10)
 ```
 
-```
-##     steps       date interval Day of Week weekday or weekend
-##  1:    NA 2012-10-01        0      Monday            weekday
-##  2:    NA 2012-10-01        5      Monday            weekday
-##  3:    NA 2012-10-01       10      Monday            weekday
-##  4:    NA 2012-10-01       15      Monday            weekday
-##  5:    NA 2012-10-01       20      Monday            weekday
-##  6:    NA 2012-10-01       25      Monday            weekday
-##  7:    NA 2012-10-01       30      Monday            weekday
-##  8:    NA 2012-10-01       35      Monday            weekday
-##  9:    NA 2012-10-01       40      Monday            weekday
-## 10:    NA 2012-10-01       45      Monday            weekday
-```
+    ##     steps       date interval Day of Week weekday or weekend
+    ##  1:    NA 2012-10-01        0      Monday            weekday
+    ##  2:    NA 2012-10-01        5      Monday            weekday
+    ##  3:    NA 2012-10-01       10      Monday            weekday
+    ##  4:    NA 2012-10-01       15      Monday            weekday
+    ##  5:    NA 2012-10-01       20      Monday            weekday
+    ##  6:    NA 2012-10-01       25      Monday            weekday
+    ##  7:    NA 2012-10-01       30      Monday            weekday
+    ##  8:    NA 2012-10-01       35      Monday            weekday
+    ##  9:    NA 2012-10-01       40      Monday            weekday
+    ## 10:    NA 2012-10-01       45      Monday            weekday
 
-2. Panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+1.  Panel plot containing a time series plot of the 5-minute interval
+    (x-axis) and the average number of steps taken, averaged across all
+    weekday days or weekend days (y-axis).
 
-
-```r
+``` r
 activityDT[is.na(steps), "steps"] <- activityDT[, c(lapply(.SD, median, na.rm = TRUE)), .SDcols = c("steps")]
 IntervalDT <- activityDT[, c(lapply(.SD, mean, na.rm = TRUE)), .SDcols = c("steps"), by = .(interval, `weekday or weekend`)] 
 ggplot(IntervalDT , aes(x = interval , y = steps, color=`weekday or weekend`)) + geom_line() + labs(title = "Avg. Daily Steps by Weektype", x = "Interval", y = "No. of Steps") + facet_wrap(~`weekday or weekend` , ncol = 1, nrow=2)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+![](Figs/unnamed-chunk-13-1.png)
